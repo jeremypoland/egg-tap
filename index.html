@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🥚 EGG HATCH JACKPOT 🥚</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    background: #05010f;
+    touch-action: manipulation;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    position: relative;
+  }
+
+  /* Animated casino background */
+  #bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background: radial-gradient(circle at 50% 40%, #2a0a4a 0%, #0a0018 60%, #000 100%);
+    overflow: hidden;
+  }
+
+  #bg::before {
+    content: '';
+    position: absolute;
+    inset: -50%;
+    background:
+      repeating-conic-gradient(from 0deg, #ff00cc11 0deg 10deg, transparent 10deg 20deg);
+    animation: spinBg 30s linear infinite;
+  }
+
+  @keyframes spinBg {
+    to { transform: rotate(360deg); }
+  }
+
+  .light {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(2px);
+    animation: twinkle 1.2s ease-in-out infinite;
+  }
+
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.2; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.3); }
+  }
+
+  .flash-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0;
+    mix-blend-mode: screen;
+  }
+
+  #top-bar {
+    position: relative;
+    z-index: 5;
+    width: 100%;
+    text-align: center;
+    padding-top: max(16px, env(safe-area-inset-top));
+  }
+
+  #title {
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    background: linear-gradient(90deg, #ffd700, #ff00e6, #00e5ff, #ffd700);
+    background-size: 300% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: shimmer 3s linear infinite;
+    text-shadow: 0 0 30px rgba(255,255,255,0.15);
+  }
+
+  @keyframes shimmer {
+    to { background-position: 300% center; }
+  }
+
+  #mute-btn {
+    position: absolute;
+    top: max(16px, env(safe-area-inset-top));
+    right: 16px;
+    z-index: 6;
+    background: rgba(255,255,255,0.08);
+    border: 2px solid rgba(255,215,0,0.4);
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    font-size: 20px;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #mute-btn:active {
+    transform: scale(0.9);
+  }
+
+  #score-panel {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    gap: 24px;
+    margin-top: 10px;
+    font-size: 15px;
+  }
+
+  .stat {
+    background: rgba(255,255,255,0.06);
+    border: 2px solid rgba(255,215,0,0.4);
+    border-radius: 14px;
+    padding: 8px 18px;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(255,215,0,0.15) inset;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: #ffd700cc;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  .stat-value {
+    font-size: 22px;
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 0 0 10px #fff8, 0 0 20px #ffd70088;
+  }
+
+  #game-area {
+    position: relative;
+    z-index: 5;
+    flex: 1;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #progress-ring-wrap {
+    position: relative;
+    width: min(68vw, 340px);
+    height: min(68vw, 340px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #progress-ring {
+    position: absolute;
+    inset: 0;
+    transform: rotate(-90deg);
+  }
+
+  #progress-ring circle {
+    fill: none;
+    stroke-width: 10;
+  }
+
+  .ring-bg {
+    stroke: rgba(255,255,255,0.08);
+  }
+
+  .ring-fg {
+    stroke: url(#ringGradient);
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.15s ease-out;
+    filter: drop-shadow(0 0 8px #ffea00cc);
+  }
+
+  #egg-btn {
+    position: relative;
+    background: none;
+    border: none;
+    font-size: min(38vw, 190px);
+    line-height: 1;
+    cursor: pointer;
+    filter: drop-shadow(0 0 25px rgba(255, 215, 0, 0.55));
+    transition: transform 0.06s ease-out;
+    will-change: transform;
+    z-index: 2;
+  }
+
+  #egg-btn:active {
+    transform: scale(0.9);
+  }
+
+  .egg-shake {
+    animation: eggShake 0.28s ease-in-out;
+  }
+
+  @keyframes eggShake {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    20% { transform: rotate(-9deg) scale(1.05); }
+    40% { transform: rotate(8deg) scale(1.08); }
+    60% { transform: rotate(-6deg) scale(1.05); }
+    80% { transform: rotate(5deg) scale(1.02); }
+  }
+
+  .egg-crack-glow {
+    animation: crackGlow 0.5s ease-in-out infinite alternate;
+  }
+
+  @keyframes crackGlow {
+    from { filter: drop-shadow(0 0 25px rgba(255,215,0,0.55)); }
+    to { filter: drop-shadow(0 0 55px rgba(255,80,255,0.95)) drop-shadow(0 0 30px #00e5ffcc); }
+  }
+
+  .hatch-pop {
+    animation: hatchPop 0.7s cubic-bezier(.25,1.4,.4,1) forwards;
+  }
+
+  @keyframes hatchPop {
+    0% { transform: scale(0.2) rotate(0deg); opacity: 0.2; }
+    50% { transform: scale(1.5) rotate(15deg); opacity: 1; }
+    75% { transform: scale(0.85) rotate(-8deg); }
+    100% { transform: scale(1) rotate(0deg); }
+  }
+
+  #tap-hint {
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 14px;
+    font-weight: 700;
+    color: #ffffffaa;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    animation: pulseHint 1.4s ease-in-out infinite;
+  }
+
+  @keyframes pulseHint {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+
+  .popup {
+    position: fixed;
+    z-index: 20;
+    font-weight: 900;
+    pointer-events: none;
+    text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+    animation: popupFly 0.9s ease-out forwards;
+    white-space: nowrap;
+  }
+
+  @keyframes popupFly {
+    0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+    15% { transform: translate(-50%, -70%) scale(1.3); opacity: 1; }
+    100% { transform: translate(-50%, -220%) scale(1.1); opacity: 0; }
+  }
+
+  .particle {
+    position: fixed;
+    z-index: 15;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: particleBurst 0.8s ease-out forwards;
+  }
+
+  @keyframes particleBurst {
+    0% { transform: translate(0, 0) scale(1); opacity: 1; }
+    100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+  }
+
+  .confetti {
+    position: fixed;
+    z-index: 30;
+    top: -20px;
+    pointer-events: none;
+    animation: confettiFall linear forwards;
+  }
+
+  @keyframes confettiFall {
+    to { transform: translateY(115vh) rotate(720deg); opacity: 0.9; }
+  }
+
+  #jackpot-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background: radial-gradient(circle, rgba(40,0,60,0.85), rgba(0,0,0,0.95));
+    text-align: center;
+    padding: 20px;
+  }
+
+  #jackpot-overlay.show {
+    display: flex;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  #jackpot-emoji {
+    font-size: min(45vw, 220px);
+    animation: jackpotBounce 0.8s cubic-bezier(.28,1.6,.4,1);
+    filter: drop-shadow(0 0 50px #ffd700);
+  }
+
+  @keyframes jackpotBounce {
+    0% { transform: scale(0) rotate(-30deg); }
+    60% { transform: scale(1.3) rotate(15deg); }
+    80% { transform: scale(0.9) rotate(-5deg); }
+    100% { transform: scale(1) rotate(0deg); }
+  }
+
+  #jackpot-text {
+    margin-top: 14px;
+    font-size: 34px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    background: linear-gradient(90deg, #ffd700, #ff00e6, #00e5ff, #ffd700);
+    background-size: 300% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: shimmer 2s linear infinite;
+  }
+
+  #jackpot-sub {
+    margin-top: 8px;
+    font-size: 17px;
+    color: #fff;
+    opacity: 0.9;
+  }
+
+  #share-card {
+    margin-top: 14px;
+    width: min(84vw, 380px);
+    background: linear-gradient(160deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02));
+    border: 3px solid transparent;
+    border-radius: 26px;
+    background-clip: padding-box;
+    position: relative;
+    padding: 22px 18px 26px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 0 40px rgba(255, 0, 230, 0.25), 0 0 0 3px rgba(255,215,0,0.35) inset;
+  }
+
+  #card-badge {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    color: #ffd700cc;
+    text-transform: uppercase;
+  }
+
+  #share-card #jackpot-emoji {
+    font-size: min(30vw, 130px);
+    margin: 10px 0 6px;
+    filter: drop-shadow(0 0 30px #ffd700aa);
+  }
+
+  #name-input {
+    width: 100%;
+    max-width: 320px;
+    text-align: center;
+    border: none;
+    border-bottom: 3px dashed rgba(255, 215, 0, 0.6);
+    background: transparent;
+    padding: 6px 4px 10px;
+    font-family: inherit;
+    font-weight: 900;
+    font-size: 44px;
+    line-height: 1.1;
+    background-image: linear-gradient(90deg, #ffd700, #ff00e6, #00e5ff, #ffd700);
+    background-size: 300% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 3s linear infinite;
+    caret-color: #fff;
+    outline: none;
+  }
+
+  #name-input::placeholder {
+    color: #ffffff66;
+    -webkit-text-fill-color: #ffffff66;
+    font-weight: 800;
+  }
+
+  #card-stats {
+    margin-top: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #ffffffcc;
+    letter-spacing: 0.5px;
+  }
+
+  #theme-row {
+    margin-top: 16px;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+  }
+
+  .theme-swatch {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.25);
+    cursor: pointer;
+    padding: 0;
+    box-shadow: 0 0 10px rgba(0,0,0,0.4);
+    transition: transform 0.15s ease, border-color 0.15s ease;
+  }
+
+  .theme-swatch:active {
+    transform: scale(0.9);
+  }
+
+  .theme-swatch.active {
+    border-color: #fff;
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.15), 0 0 18px rgba(255,255,255,0.6);
+    transform: scale(1.12);
+  }
+
+  #rename-hint {
+    margin-top: 10px;
+    font-size: 13px;
+    color: #ffffff88;
+    font-weight: 600;
+  }
+
+  #action-row {
+    margin-top: 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  #share-btn {
+    font-size: 17px;
+    font-weight: 800;
+    color: #05010f;
+    background: linear-gradient(90deg, #00e5ff, #00ffb0);
+    border: none;
+    padding: 15px 34px;
+    border-radius: 30px;
+    box-shadow: 0 0 25px rgba(0, 229, 255, 0.55);
+    cursor: pointer;
+    letter-spacing: 0.5px;
+  }
+
+  #share-btn:active {
+    transform: scale(0.95);
+  }
+
+  #share-btn.sharing {
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  #play-again {
+    margin-top: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: #ffd700;
+    background: transparent;
+    border: 2px solid rgba(255,215,0,0.5);
+    padding: 10px 26px;
+    border-radius: 24px;
+    box-shadow: none;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+  }
+
+  #play-again:active {
+    transform: scale(0.95);
+  }
+
+  #combo-banner {
+    position: fixed;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 25;
+    font-size: 42px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    color: #fff;
+    text-shadow: 0 0 20px #ff00e6, 0 0 40px #ffd700;
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  .combo-show {
+    animation: comboPop 0.9s ease-out forwards;
+  }
+
+  @keyframes comboPop {
+    0% { transform: translate(-50%, -50%) scale(0.3) rotate(-10deg); opacity: 0; }
+    25% { transform: translate(-50%, -50%) scale(1.3) rotate(4deg); opacity: 1; }
+    40% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+    100% { transform: translate(-50%, -80%) scale(1) rotate(0deg); opacity: 0; }
+  }
+
+  #screen-flash {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    background: #fff;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .flash-hit {
+    animation: whiteFlash 0.15s ease-out;
+  }
+
+  @keyframes whiteFlash {
+    0% { opacity: 0.5; }
+    100% { opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div id="bg"></div>
+<div id="screen-flash"></div>
+<div id="combo-banner"></div>
+
+<div id="top-bar">
+  <div id="title">🎰 EGG HATCH JACKPOT 🎰</div>
+  <button id="mute-btn" aria-label="Toggle sound">🔊</button>
+</div>
+
+<div id="score-panel">
+  <div class="stat">
+    <div class="stat-label">Taps</div>
+    <div class="stat-value" id="tap-count">0</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Score</div>
+    <div class="stat-value" id="score-count">0</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Best</div>
+    <div class="stat-value" id="best-count">0</div>
+  </div>
+</div>
+
+<div id="game-area">
+  <div id="progress-ring-wrap">
+    <svg id="progress-ring" width="100%" height="100%" viewBox="0 0 200 200">
+      <defs>
+        <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#ffd700"/>
+          <stop offset="50%" stop-color="#ff00e6"/>
+          <stop offset="100%" stop-color="#00e5ff"/>
+        </linearGradient>
+      </defs>
+      <circle class="ring-bg" cx="100" cy="100" r="92"/>
+      <circle class="ring-fg" id="ring-fg" cx="100" cy="100" r="92" stroke-dasharray="578" stroke-dashoffset="578"/>
+    </svg>
+    <button id="egg-btn">🥚</button>
+    <div id="tap-hint">TAP THE EGG!</div>
+  </div>
+</div>
+
+<div id="jackpot-overlay">
+  <div id="jackpot-text">JACKPOT HATCH!</div>
+
+  <div id="share-card">
+    <div id="card-badge">🎰 EGG HATCH JACKPOT 🎰</div>
+    <div id="jackpot-emoji">🐣</div>
+    <input id="name-input" type="text" maxlength="14" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="Name me!">
+    <div id="card-stats"></div>
+  </div>
+
+  <div id="theme-row"></div>
+
+  <div id="rename-hint">✏️ Tap the name to change it</div>
+
+  <div id="action-row">
+    <button id="share-btn">📤 Share My Hatchling</button>
+    <button id="play-again">🥚 Play Again</button>
+  </div>
+
+  <canvas id="share-canvas" width="1080" height="1080" style="display:none;"></canvas>
+</div>
+
+<script>
+(function() {
+  const TAPS_NEEDED = 100;
+  const animals = ['🐣','🐤','🐥','🦆','🐔','🦜','🦉','🐍','🐢','🦎','🐊','🦖'];
+  const colors = ['#ffd700','#ff00e6','#00e5ff','#ff3d3d','#39ff14','#ff9100','#c400ff'];
+
+  const nameSuggestions = {
+    '🐣': ['Chirpy', 'Sunny', 'Newt'],
+    '🐤': ['Tweety', 'Buttercup', 'Pip'],
+    '🐥': ['Goldie', 'Sunbeam', 'Fluff'],
+    '🦆': ['Quacker', 'Puddles', 'Waddles'],
+    '🐔': ['Clucky', 'Henrietta', 'Nugget'],
+    '🦜': ['Polly', 'Rio', 'Mango'],
+    '🦉': ['Hootie', 'Athena', 'Whooper'],
+    '🐍': ['Noodle', 'Slinky', 'Sly'],
+    '🐢': ['Shelly', 'Tank', 'Speedy'],
+    '🦎': ['Zippy', 'Gecko', 'Newt Jr'],
+    '🐊': ['Snappy', 'Chompy', 'Swampy'],
+    '🦖': ['Rexy', 'Roar', 'Stomper'],
+  };
+
+  const themes = [
+    {
+      id: 'classic',
+      label: 'Classic Casino',
+      swatch: 'radial-gradient(circle at 35% 30%, #6a1b9a, #12002a 70%)',
+      cardCss: 'linear-gradient(160deg, rgba(122,20,160,0.28), rgba(10,0,25,0.4))',
+      borderColor: 'rgba(255,215,0,0.5)',
+      canvasStops: [[0, '#2a0a4a'], [0.6, '#12002a'], [1, '#04000c']],
+      sparkleColors: ['#ffd700', '#ff00e6', '#00e5ff', '#ffffff'],
+    },
+    {
+      id: 'neon',
+      label: 'Neon Nights',
+      swatch: 'radial-gradient(circle at 35% 30%, #ff00e6, #001014 70%)',
+      cardCss: 'linear-gradient(160deg, rgba(255,0,230,0.22), rgba(0,20,25,0.5))',
+      borderColor: 'rgba(0,229,255,0.6)',
+      canvasStops: [[0, '#26003d'], [0.55, '#04121a'], [1, '#000205']],
+      sparkleColors: ['#ff00e6', '#00e5ff', '#39ff14', '#ffffff'],
+    },
+    {
+      id: 'gold',
+      label: 'Gold Rush',
+      swatch: 'radial-gradient(circle at 35% 30%, #ffb700, #2a1400 70%)',
+      cardCss: 'linear-gradient(160deg, rgba(255,183,0,0.25), rgba(30,15,0,0.5))',
+      borderColor: 'rgba(255,215,0,0.75)',
+      canvasStops: [[0, '#5a3d00'], [0.55, '#2a1400'], [1, '#0a0500']],
+      sparkleColors: ['#ffd700', '#ffb700', '#fff2b0', '#ffffff'],
+    },
+    {
+      id: 'cotton',
+      label: 'Cotton Candy',
+      swatch: 'radial-gradient(circle at 35% 30%, #ff9ee6, #7ea8ff 70%)',
+      cardCss: 'linear-gradient(160deg, rgba(255,158,230,0.25), rgba(126,168,255,0.3))',
+      borderColor: 'rgba(255,255,255,0.6)',
+      canvasStops: [[0, '#ff9ee6'], [0.55, '#c58bff'], [1, '#5b7fff']],
+      sparkleColors: ['#ffffff', '#ffe0f7', '#c9f0ff', '#ffd6f0'],
+    },
+  ];
+  let currentTheme = 0;
+
+  let taps = 0;
+  let score = 0;
+  let best = parseInt(localStorage.getItem('eggBest') || '0', 10);
+  let locked = false;
+  let muted = false;
+
+  // ---------- Sound engine (Web Audio API, no external files) ----------
+  let actx = null;
+  function ctx() {
+    if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+    if (actx.state === 'suspended') actx.resume();
+    return actx;
+  }
+
+  function tone(freq, duration, type, startTime, gainPeak, glideTo) {
+    const ac = ctx();
+    const osc = ac.createOscillator();
+    const gain = ac.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.setValueAtTime(freq, startTime);
+    if (glideTo) osc.frequency.exponentialRampToValueAtTime(glideTo, startTime + duration);
+    gain.gain.setValueAtTime(0.0001, startTime);
+    gain.gain.exponentialRampToValueAtTime(gainPeak || 0.25, startTime + 0.012);
+    gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+    osc.connect(gain);
+    gain.connect(ac.destination);
+    osc.start(startTime);
+    osc.stop(startTime + duration + 0.02);
+  }
+
+  function playTap(pitchUp) {
+    if (muted) return;
+    const ac = ctx();
+    const t = ac.currentTime;
+    const base = 520 + pitchUp * 6;
+    tone(base, 0.09, 'triangle', t, 0.22, base * 1.7);
+  }
+
+  function playBonus() {
+    if (muted) return;
+    const ac = ctx();
+    const t = ac.currentTime;
+    [660, 880, 1100].forEach((f, i) => tone(f, 0.16, 'square', t + i * 0.06, 0.18));
+  }
+
+  function playCrack() {
+    if (muted) return;
+    const ac = ctx();
+    const t = ac.currentTime;
+    // noise burst for a crack sound
+    const bufferSize = ac.sampleRate * 0.15;
+    const buffer = ac.createBuffer(1, bufferSize, ac.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
+    }
+    const noise = ac.createBufferSource();
+    noise.buffer = buffer;
+    const gain = ac.createGain();
+    gain.gain.setValueAtTime(0.35, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+    const filter = ac.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.value = 1200;
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(ac.destination);
+    noise.start(t);
+  }
+
+  function playJackpot() {
+    if (muted) return;
+    const ac = ctx();
+    const t = ac.currentTime;
+    const melody = [523, 659, 784, 1046, 1318, 1568];
+    melody.forEach((f, i) => tone(f, 0.28, 'square', t + i * 0.1, 0.2));
+    // shimmering sparkle layer
+    for (let i = 0; i < 12; i++) {
+      tone(1500 + Math.random() * 1500, 0.15, 'sine', t + Math.random() * 1.0, 0.06);
+    }
+  }
+  function playBass(progress) {
+    if (muted) return;
+    const ac = ctx();
+    const t = ac.currentTime;
+    // progress: 0..1 -> deeper + louder as we approach the hatch
+    const freq = 95 - progress * 35;
+    const peak = 0.28 + progress * 0.35;
+    const osc = ac.createOscillator();
+    const osc2 = ac.createOscillator();
+    const gain = ac.createGain();
+    osc.type = 'sine';
+    osc2.type = 'triangle';
+    osc.frequency.setValueAtTime(freq, t);
+    osc2.frequency.setValueAtTime(freq * 1.005, t);
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(peak, t + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.22 + progress * 0.15);
+    osc.connect(gain);
+    osc2.connect(gain);
+    gain.connect(ac.destination);
+    osc.start(t);
+    osc2.start(t);
+    osc.stop(t + 0.4);
+    osc2.stop(t + 0.4);
+  }
+
+  // ---------- Background "cotton candy pop" music loop ----------
+  let musicTimer = null;
+  let musicStep = 0;
+  const musicChords = [
+    [523.25, 659.25, 783.99],   // C major
+    [587.33, 739.99, 880.00],   // D minor-ish (Dm-ish pop)
+    [659.25, 830.61, 987.77],   // E
+    [698.46, 880.00, 1046.50],  // F
+  ];
+
+  function playMusicStep() {
+    if (muted) return;
+    const ac = ctx();
+    const t = ac.currentTime;
+    const chord = musicChords[Math.floor(musicStep / 4) % musicChords.length];
+    const note = chord[musicStep % chord.length];
+    const osc = ac.createOscillator();
+    const gain = ac.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(note, t);
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(0.05, t + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.28);
+    osc.connect(gain);
+    gain.connect(ac.destination);
+    osc.start(t);
+    osc.stop(t + 0.3);
+    musicStep++;
+  }
+
+  function startMusic() {
+    if (musicTimer) return;
+    musicStep = 0;
+    musicTimer = setInterval(playMusicStep, 260);
+  }
+
+  function stopMusic() {
+    if (musicTimer) {
+      clearInterval(musicTimer);
+      musicTimer = null;
+    }
+  }
+  // ----------------------------------------------------------------------
+
+  const eggBtn = document.getElementById('egg-btn');
+  const tapCountEl = document.getElementById('tap-count');
+  const scoreCountEl = document.getElementById('score-count');
+  const bestCountEl = document.getElementById('best-count');
+  const ringFg = document.getElementById('ring-fg');
+  const jackpotOverlay = document.getElementById('jackpot-overlay');
+  const jackpotEmoji = document.getElementById('jackpot-emoji');
+  const cardStats = document.getElementById('card-stats');
+  const nameInput = document.getElementById('name-input');
+  const shareBtn = document.getElementById('share-btn');
+  const shareCanvas = document.getElementById('share-canvas');
+  const themeRow = document.getElementById('theme-row');
+  const playAgainBtn = document.getElementById('play-again');
+  const screenFlash = document.getElementById('screen-flash');
+  const comboBanner = document.getElementById('combo-banner');
+  const tapHint = document.getElementById('tap-hint');
+  const bg = document.getElementById('bg');
+
+  bestCountEl.textContent = best;
+
+  const CIRC = 2 * Math.PI * 92;
+  ringFg.setAttribute('stroke-dasharray', CIRC);
+  ringFg.setAttribute('stroke-dashoffset', CIRC);
+
+  // Background twinkle lights
+  for (let i = 0; i < 30; i++) {
+    const l = document.createElement('div');
+    l.className = 'light';
+    const size = 3 + Math.random() * 6;
+    l.style.width = size + 'px';
+    l.style.height = size + 'px';
+    l.style.left = Math.random() * 100 + '%';
+    l.style.top = Math.random() * 100 + '%';
+    l.style.background = colors[Math.floor(Math.random() * colors.length)];
+    l.style.animationDelay = (Math.random() * 2) + 's';
+    l.style.animationDuration = (0.8 + Math.random() * 1.2) + 's';
+    bg.appendChild(l);
+  }
+
+  function rand(min, max) { return Math.random() * (max - min) + min; }
+
+  function spawnParticles(x, y) {
+    const count = 10;
+    for (let i = 0; i < count; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const size = rand(6, 14);
+      p.style.width = size + 'px';
+      p.style.height = size + 'px';
+      p.style.left = x + 'px';
+      p.style.top = y + 'px';
+      p.style.background = colors[Math.floor(Math.random() * colors.length)];
+      const angle = rand(0, Math.PI * 2);
+      const dist = rand(60, 160);
+      p.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+      p.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+      p.style.boxShadow = '0 0 10px currentColor';
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), 850);
+    }
+  }
+
+  function spawnPopup(x, y, text, color) {
+    const el = document.createElement('div');
+    el.className = 'popup';
+    el.textContent = text;
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+    el.style.fontSize = rand(22, 34) + 'px';
+    el.style.color = color;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 900);
+  }
+
+  function flashScreen() {
+    screenFlash.classList.remove('flash-hit');
+    void screenFlash.offsetWidth;
+    screenFlash.classList.add('flash-hit');
+  }
+
+  function showCombo(text) {
+    comboBanner.textContent = text;
+    comboBanner.classList.remove('combo-show');
+    void comboBanner.offsetWidth;
+    comboBanner.classList.add('combo-show');
+  }
+
+  function confettiBurst() {
+    const shapes = ['🎉','✨','💰','⭐','🎊'];
+    for (let i = 0; i < 40; i++) {
+      const c = document.createElement('div');
+      c.className = 'confetti';
+      c.textContent = shapes[Math.floor(Math.random() * shapes.length)];
+      c.style.left = Math.random() * 100 + 'vw';
+      c.style.fontSize = rand(16, 30) + 'px';
+      c.style.animationDuration = rand(1.8, 3.2) + 's';
+      c.style.animationDelay = rand(0, 0.5) + 's';
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 4000);
+    }
+  }
+
+  function vibrate(ms) {
+    if (navigator.vibrate) navigator.vibrate(ms);
+  }
+
+  function handleTap(e) {
+    if (locked) return;
+
+    let x, y;
+    if (e.changedTouches && e.changedTouches.length) {
+      x = e.changedTouches[0].clientX;
+      y = e.changedTouches[0].clientY;
+    } else {
+      x = e.clientX;
+      y = e.clientY;
+    }
+
+    taps++;
+    const gain = 100 + (taps % 10 === 0 ? 400 : 0);
+    score += gain;
+
+    tapCountEl.textContent = taps;
+    scoreCountEl.textContent = score.toLocaleString();
+
+    const progress = Math.min(taps / TAPS_NEEDED, 1);
+    ringFg.setAttribute('stroke-dashoffset', CIRC - CIRC * progress);
+
+    spawnPopup(x, y, '+' + gain, colors[Math.floor(Math.random() * colors.length)]);
+    spawnParticles(x, y);
+    flashScreen();
+    vibrate(15);
+    playTap(taps);
+    playBass(progress);
+
+    if (taps === 1) startMusic();
+
+    eggBtn.classList.remove('egg-shake');
+    void eggBtn.offsetWidth;
+    eggBtn.classList.add('egg-shake');
+
+    // Escalating screen shake as we approach the hatch
+    if (taps >= 60) {
+      const intensity = Math.min((taps - 60) / 40, 1);
+      document.body.style.transform =
+        `translate(${rand(-2 - intensity * 6, 2 + intensity * 6)}px, ${rand(-2 - intensity * 6, 2 + intensity * 6)}px)`;
+      clearTimeout(window.__shakeReset);
+      window.__shakeReset = setTimeout(() => { document.body.style.transform = ''; }, 90);
+    }
+
+    if (taps === 1) tapHint.style.display = 'none';
+
+    if (taps >= 75 && taps < TAPS_NEEDED) {
+      eggBtn.classList.add('egg-crack-glow');
+    }
+
+    if (taps % 10 === 0 && taps < TAPS_NEEDED) {
+      showCombo(taps + ' TAPS! 🔥 BONUS!');
+      vibrate([20, 40, 20]);
+      playBonus();
+    }
+
+    if (taps >= TAPS_NEEDED) {
+      locked = true;
+      setTimeout(hatchEgg, 150);
+    }
+  }
+
+  function hatchEgg() {
+    eggBtn.classList.remove('egg-crack-glow');
+    vibrate([30, 60, 30, 60, 100]);
+    playCrack();
+    stopMusic();
+    document.body.style.transform = '';
+
+    const animal = animals[Math.floor(Math.random() * animals.length)];
+
+    if (score > best) {
+      best = score;
+      localStorage.setItem('eggBest', best);
+      bestCountEl.textContent = best;
+    }
+
+    setTimeout(() => {
+      jackpotEmoji.textContent = animal;
+      const suggestions = nameSuggestions[animal] || ['Buddy'];
+      const suggestedName = suggestions[Math.floor(Math.random() * suggestions.length)];
+      nameInput.value = suggestedName;
+      cardStats.textContent = '🔥 ' + taps + ' taps  •  Score ' + score.toLocaleString();
+      jackpotOverlay.classList.add('show');
+      confettiBurst();
+      playJackpot();
+      fitNameInput();
+      requestAnimationFrame(() => {
+        nameInput.focus();
+        nameInput.select();
+      });
+    }, 400);
+  }
+
+  function applyTheme(index) {
+    currentTheme = index;
+    const t = themes[index];
+    const card = document.getElementById('share-card');
+    card.style.background = t.cardCss;
+    card.style.boxShadow = `0 0 40px ${t.borderColor}, 0 0 0 3px ${t.borderColor} inset`;
+    document.querySelectorAll('.theme-swatch').forEach((el, i) => {
+      el.classList.toggle('active', i === index);
+    });
+  }
+
+  themes.forEach((t, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'theme-swatch' + (i === 0 ? ' active' : '');
+    btn.style.background = t.swatch;
+    btn.setAttribute('aria-label', t.label);
+    btn.addEventListener('click', () => applyTheme(i));
+    themeRow.appendChild(btn);
+  });
+
+  function fitNameInput() {
+    let size = 44;
+    nameInput.style.fontSize = size + 'px';
+    while (nameInput.scrollWidth > nameInput.clientWidth && size > 20) {
+      size -= 2;
+      nameInput.style.fontSize = size + 'px';
+    }
+  }
+
+  nameInput.addEventListener('input', fitNameInput);
+
+  function buildShareCanvas() {
+    const cvs = shareCanvas;
+    const ctx2d = cvs.getContext('2d');
+    const W = cvs.width, H = cvs.height;
+    const name = (nameInput.value || 'My Hatchling').trim();
+    const animal = jackpotEmoji.textContent;
+    const theme = themes[currentTheme];
+
+    // Background
+    const bgGrad = ctx2d.createRadialGradient(W/2, H*0.38, 60, W/2, H*0.45, W*0.75);
+    theme.canvasStops.forEach(([offset, color]) => bgGrad.addColorStop(offset, color));
+    ctx2d.fillStyle = bgGrad;
+    ctx2d.fillRect(0, 0, W, H);
+
+    // Sparkles
+    for (let i = 0; i < 70; i++) {
+      ctx2d.beginPath();
+      const r = Math.random() * 3.5 + 0.5;
+      ctx2d.arc(Math.random() * W, Math.random() * H, r, 0, Math.PI * 2);
+      ctx2d.fillStyle = theme.sparkleColors[Math.floor(Math.random() * theme.sparkleColors.length)];
+      ctx2d.globalAlpha = Math.random() * 0.7 + 0.15;
+      ctx2d.fill();
+    }
+    ctx2d.globalAlpha = 1;
+
+    // Outer glowing border
+    ctx2d.strokeStyle = theme.borderColor;
+    ctx2d.lineWidth = 14;
+    ctx2d.strokeRect(20, 20, W - 40, H - 40);
+
+    // Badge
+    ctx2d.textAlign = 'center';
+    ctx2d.font = '900 34px -apple-system, sans-serif';
+    ctx2d.fillStyle = 'rgba(255,215,0,0.85)';
+    ctx2d.fillText('🎰 EGG HATCH JACKPOT 🎰', W/2, 130);
+
+    // Animal emoji
+    ctx2d.font = '440px -apple-system, sans-serif';
+    ctx2d.shadowColor = 'rgba(255,215,0,0.7)';
+    ctx2d.shadowBlur = 50;
+    ctx2d.fillText(animal, W/2, 560);
+    ctx2d.shadowBlur = 0;
+
+    // Name with gradient + glow, auto-shrink to fit width
+    let nameSize = 92;
+    ctx2d.font = `900 ${nameSize}px -apple-system, sans-serif`;
+    while (ctx2d.measureText(name).width > W - 160 && nameSize > 36) {
+      nameSize -= 4;
+      ctx2d.font = `900 ${nameSize}px -apple-system, sans-serif`;
+    }
+    const textWidth = ctx2d.measureText(name).width;
+    const nameGrad = ctx2d.createLinearGradient(W/2 - textWidth/2, 0, W/2 + textWidth/2, 0);
+    nameGrad.addColorStop(0, '#ffd700');
+    nameGrad.addColorStop(0.4, '#ff00e6');
+    nameGrad.addColorStop(0.75, '#00e5ff');
+    nameGrad.addColorStop(1, '#ffd700');
+    ctx2d.fillStyle = nameGrad;
+    ctx2d.shadowColor = 'rgba(255,0,230,0.65)';
+    ctx2d.shadowBlur = 30;
+    ctx2d.fillText(name, W/2, 730);
+    ctx2d.shadowBlur = 0;
+
+    // Stats
+    ctx2d.font = '700 34px -apple-system, sans-serif';
+    ctx2d.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx2d.fillText('🔥 ' + taps + ' taps  •  Score ' + score.toLocaleString(), W/2, 820);
+
+    // Footer branding
+    ctx2d.font = '700 24px -apple-system, sans-serif';
+    ctx2d.fillStyle = 'rgba(255,255,255,0.45)';
+    ctx2d.fillText('EGG HATCH JACKPOT 🥚', W/2, H - 60);
+
+    return new Promise((resolve) => cvs.toBlob(resolve, 'image/png', 0.95));
+  }
+
+  async function handleShare() {
+    shareBtn.classList.add('sharing');
+    shareBtn.textContent = 'Generating…';
+    try {
+      const blob = await buildShareCanvas();
+      const name = (nameInput.value || 'My Hatchling').trim();
+      const fileName = 'egg-hatch-' + name.replace(/[^a-z0-9]/gi, '') + '.png';
+      const file = new File([blob], fileName, { type: 'image/png' });
+
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: 'Egg Hatch Jackpot!',
+          text: 'I just hatched ' + name + '! 🥚➡️' + jackpotEmoji.textContent,
+        });
+      } else {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 4000);
+      }
+    } catch (err) {
+      // user likely cancelled the native share sheet — no action needed
+    } finally {
+      shareBtn.classList.remove('sharing');
+      shareBtn.textContent = '📤 Share My Hatchling';
+    }
+  }
+
+  shareBtn.addEventListener('click', handleShare);
+
+  function resetGame() {
+    taps = 0;
+    score = 0;
+    locked = false;
+    tapCountEl.textContent = '0';
+    scoreCountEl.textContent = '0';
+    ringFg.setAttribute('stroke-dashoffset', CIRC);
+    eggBtn.textContent = '🥚';
+    eggBtn.classList.remove('hatch-pop', 'egg-crack-glow');
+    jackpotOverlay.classList.remove('show');
+    tapHint.style.display = 'block';
+    nameInput.value = '';
+    shareBtn.classList.remove('sharing');
+    shareBtn.textContent = '📤 Share My Hatchling';
+  }
+
+  eggBtn.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    handleTap(e);
+  }, { passive: false });
+
+  eggBtn.addEventListener('click', function(e) {
+    if (e.pointerType === undefined && 'ontouchstart' in window) return;
+    handleTap(e);
+  });
+
+  applyTheme(0);
+
+  playAgainBtn.addEventListener('click', resetGame);
+
+  const muteBtn = document.getElementById('mute-btn');
+  muteBtn.addEventListener('click', function() {
+    muted = !muted;
+    muteBtn.textContent = muted ? '🔇' : '🔊';
+    if (muted) {
+      stopMusic();
+    } else {
+      ctx();
+      if (taps > 0 && taps < TAPS_NEEDED) startMusic();
+    }
+  });
+})();
+</script>
+</body>
+</html>
